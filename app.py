@@ -23,7 +23,15 @@ async def on_message(message):
     modified_content = x_pattern.sub(r"https://vxtwitter.com/\1\2", modified_content)
 
     if modified_content != message.content:
-        await message.channel.send(f'{message.author.mention} posted: {modified_content}')
+        if message.reference:
+            ## If the message is a reply, get OG message that was replied to
+            replied_message = await message.channel.fetch_message(message.reference.message_id)
+            ## Send a reply to the OG message
+            await replied_message.reply(f'{message.author.mention} posted: {modified_content}')
+        else:
+            ## If the message is not a reply, just send as usual
+            await message.channel.send(f'{message.author.mention} posted: {modified_content}')
+
         await message.delete()
 
 client.run('YOUR_DISCORD_TOKEN_HERE')
